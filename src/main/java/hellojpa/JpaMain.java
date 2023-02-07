@@ -67,11 +67,29 @@ public class JpaMain {
 //
 //            System.out.println("==================");
 
-            Member member = new Member();
-//            member.setId("ID_B");
-            member.setUsername("D");
+            Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team);
 
+            Member member = new Member();
+            member.setUserName("member1");
+            member.setTeam(team);
             em.persist(member);
+
+            team.addMember(member);
+
+            em.flush(); // 영속성 컨텍스트 캐시에 있는거 전부 처리
+            em.clear(); // 영속성 컨텍스트 초기화
+    
+            Team findTeam = em.find(Team.class, team.getId());
+            List<Member> members = findTeam.getMembers();
+
+
+            // 서로를 참조하고 있어서 계속 무한루프에 빠지게 됌 (서로 toString 이 있어서)
+            System.out.println("=====================");
+            System.out.println("members = " + findTeam);
+            System.out.println("=====================");
+
 
             tx.commit();
         } catch (Exception e) {
